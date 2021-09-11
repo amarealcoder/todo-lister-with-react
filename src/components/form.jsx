@@ -1,41 +1,48 @@
 import React, { Component } from 'react';
-import Input from './input';
+import List from './List';
 
 class Form extends Component {
-
-  constructor(){
+  constructor() {
     super();
-    this.state = {
-      user: { task: '', duration: '' },
-      items: [],
+    this.state = JSON.parse(window.localStorage.getItem('state')) || {
+      task: '',
+      duration: '',
+      todos: [],
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this)
+    this.handleChange = this.handleChange.bind(this);
   }
-  handleChange = ({ currentTarget: input }) => {
-    const user = { ...this.state.user };
-    user[input.id] = input.value;
-    this.setState({ user });
+  setState(state) {
+    window.localStorage.setItem('state', JSON.stringify(state));
+    super.setState(state);
+  }
+
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
   };
 
   handleSubmit = (e) => {
     e.preventDefault();
+    const todo = {
+      task: this.state.task,
+      duration: this.state.duration,
+    };
 
-    let items = [...this.state.items];
-
-    items.push({
-      task: this.state.user.task,
-      duration: this.state.user.duration,
+    this.setState({
+      todos: [...this.state.todos, todo],
+      task: '',
+      duration: '',
     });
-    this.setState({ items });
+  };
 
-    // console.log('submitted', items);
+  handleDelete = (item) => {
+    console.log(item, "hello");
   };
   render() {
-    const user = this.state;
-    const items = [...this.state.items];
-    console.log(items, typeof items);
+    const todos = [...this.state.todos];
     return (
       <div>
         <div className='main-header'>
@@ -45,18 +52,37 @@ class Form extends Component {
           <h2>Make your day stress free by using a todo list</h2>
         </div>
         <form id='main-form' onSubmit={this.handleSubmit}>
-          <Input
-            value={user.task}
-            onChange={this.handleChange}
-            label='Task'
-            id='task'
-          />
-          <Input
-            value={user.duration}
-            onChange={this.handleChange}
-            label='Duration of task'
-            id='duration'
-          />
+          <div className='form-group'>
+            <label htmlFor='task'>
+              <b>Task </b>
+            </label>
+            <input
+              value={this.state.task}
+              onChange={this.handleChange}
+              type='text'
+              className='form-input'
+              id='task'
+              name='task'
+              placeholder='Input your task'
+              required
+            />
+          </div>
+
+          <div className='form-group'>
+            <label htmlFor='duration'>
+              <b>Duration of task</b>
+            </label>
+            <input
+              value={this.state.duration}
+              onChange={this.handleChange}
+              type='text'
+              className='form-input'
+              id='duration'
+              name='duration'
+              placeholder='Set your duration'
+              required
+            />
+          </div>
 
           <input type='submit' value='Submit' className='btn' />
         </form>
@@ -69,12 +95,11 @@ class Form extends Component {
             </tr>
           </thead>
           <tbody id='task-list'>
-            {items.map((item) => {
+            {todos.map((item ) => (
               <tr key={Math.random()}>
-                <td>{item.task}</td>
-                <td>{item.duration}</td>
-              </tr>;
-            })}
+                <List todo={item} onClick={() => this.handleDelete(item)}/>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
