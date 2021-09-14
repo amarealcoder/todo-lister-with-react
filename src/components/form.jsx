@@ -38,19 +38,41 @@ class Form extends Component {
     });
   };
 
-  handleDelete = (item) => {
-    console.log(item, "hello");
+  handleDelete = (item, index) => {
+    const todos = [...this.state.todos];
+    todos.splice(index, 1);
+    this.setState({ todos });
   };
+
+  handleCheck=()=>{
+    console.log('check')
+  }
+
+  renderCount() {
+    const todos = [...this.state.todos];
+    const todosCount = todos.length;
+    if (todosCount === 0)
+      return <h3 className='todo-count'>There are no tasks to do</h3>;
+    if (todosCount === 1)
+      return <h3 className='todo-count'>There is 1 task to do</h3>;
+    if (todosCount > 1)
+      return (
+        <h3 className='todo-count'>There are {todosCount} tasks to do</h3>
+      );
+  }
+
   render() {
     const todos = [...this.state.todos];
+
     return (
       <div>
         <div className='main-header'>
-          <h1>Todo Lister</h1>
+          <h1>Todo List</h1>
         </div>
         <div id='todo-header'>
           <h2>Make your day stress free by using a todo list</h2>
         </div>
+        {this.renderCount()}
         <form id='main-form' onSubmit={this.handleSubmit}>
           <div className='form-group'>
             <label htmlFor='task'>
@@ -89,15 +111,16 @@ class Form extends Component {
         <table className='table'>
           <thead>
             <tr>
+              <th></th>
               <th>Task</th>
               <th>Duration</th>
               <th></th>
             </tr>
           </thead>
           <tbody id='task-list'>
-            {todos.map((item ) => (
+            {todos.map((item) => (
               <tr key={Math.random()}>
-                <List todo={item} onClick={() => this.handleDelete(item)}/>
+                <List todo={item} onClick={() => this.handleDelete(item)} onCheck={() => this.handleCheck(item)}/>
               </tr>
             ))}
           </tbody>

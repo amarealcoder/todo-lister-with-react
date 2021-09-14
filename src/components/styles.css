@@ -28,6 +28,9 @@ h2 {
   text-transform: uppercase;
   text-align: center;
 }
+.todo-count{
+  margin-top: 2rem
+}
 #main-form {
   display: flex;
   flex-direction: column;
