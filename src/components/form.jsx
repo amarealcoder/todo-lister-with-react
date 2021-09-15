@@ -4,18 +4,30 @@ import List from './List';
 class Form extends Component {
   constructor() {
     super();
-    this.state = JSON.parse(window.localStorage.getItem('state')) || {
+    this.state = {
       task: '',
       duration: '',
       todos: [],
+      id: '',
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
-  setState(state) {
-    window.localStorage.setItem('state', JSON.stringify(state));
-    super.setState(state);
+
+  componentDidMount() {
+    let todos = localStorage.getItem('todos');
+
+    if (todos) {
+      todos = JSON.parse(todos);
+    } else {
+      localStorage.setItem('todos', JSON.stringify([]));
+    }
+    if (todos?.length) {
+      this.setState({
+        todos: [...todos],
+      });
+    }
   }
 
   handleChange = (e) => {
@@ -31,6 +43,12 @@ class Form extends Component {
       duration: this.state.duration,
     };
 
+    let todos = localStorage.getItem('todos');
+    todos = JSON.parse(todos);
+    todos.push(todo);
+
+    localStorage.setItem('todos', JSON.stringify(todos));
+
     this.setState({
       todos: [...this.state.todos, todo],
       task: '',
@@ -38,15 +56,12 @@ class Form extends Component {
     });
   };
 
-  handleDelete = (item, index) => {
+  handleDelete = (todo) => {
     const todos = [...this.state.todos];
-    todos.splice(index, 1);
+    todos.splice(todo, 1);
+    localStorage.setItem('todos', JSON.stringify(todos));
     this.setState({ todos });
   };
-
-  handleCheck=()=>{
-    console.log('check')
-  }
 
   renderCount() {
     const todos = [...this.state.todos];
@@ -56,9 +71,7 @@ class Form extends Component {
     if (todosCount === 1)
       return <h3 className='todo-count'>There is 1 task to do</h3>;
     if (todosCount > 1)
-      return (
-        <h3 className='todo-count'>There are {todosCount} tasks to do</h3>
-      );
+      return <h3 className='todo-count'>There are {todosCount} tasks to do</h3>;
   }
 
   render() {
@@ -118,9 +131,9 @@ class Form extends Component {
             </tr>
           </thead>
           <tbody id='task-list'>
-            {todos.map((item) => (
-              <tr key={Math.random()}>
-                <List todo={item} onClick={() => this.handleDelete(item)} onCheck={() => this.handleCheck(item)}/>
+            {todos.map((todo, index) => (
+              <tr key={index}>
+                <List todo={todo} onClick={() => this.handleDelete(todo)} />
               </tr>
             ))}
           </tbody>
